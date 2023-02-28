@@ -5,6 +5,7 @@ var express = require( 'express' ),
     passport = require( 'passport' ),
     request = require( 'request' ),
     session = require( 'express-session' ),
+//    ApiStrategy = require( 'ibmcloud-appid' ).APIStrategy,
     WebAppStrategy = require( 'ibmcloud-appid' ).WebAppStrategy,
     SelfServiceManager = require( 'ibmcloud-appid' ).SelfServiceManager,
     app = express();
@@ -91,14 +92,38 @@ app.post( '/appid/login/submit', bodyParser.urlencoded({extended: false}), passp
 	failureFlash : false
 }));
 
+/*
+ *
+ * @param req - an HTTP request object
+ * @param options.scope - The required scopes, separated by spaces. For example: 'read write update'
+ * @param options.audience - (optional) the application clientId, or the resource URI.
+ * @returns {*}
+  ApiStrategy.prototype.authenticate = function (req, options = {}) {
+
+*/
+/*
+app.post( '/appid/login/submit', function( req, res ){
+  console.log( req.body );
+  try{
+    var r = ApiStrategy.authenticate( req, { scope: 'read write update', audience: settings_appid_client_id } );
+    console.log( {r} );
+  }catch( e ){
+    console.log( {e} );
+  }
+  res.redirect( '/' );
+});
+*/
+
 //. loggedin
 app.get( '/appid/loggedin', function( req, res ){
   var user = {};
   if( req.user ){
+    var t = ( new Date() ).getTime();
     user = { 
       id: req.user.id, 
       name: req.user.name,
-      email: req.user.email
+      email: req.user.email,
+      time: t
     };
   }
   var code = Buffer.from( JSON.stringify( user ) ).toString( 'base64' );  //. max 2048 chars

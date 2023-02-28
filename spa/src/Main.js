@@ -6,6 +6,7 @@ import logo from './logo.svg';
 import './Main.css';
 
 function Main() {
+  const allowedDeltaMiilis = 3000; //. ３秒以内の認証であった場合のみ許可
   const navigate = useNavigate();
 
   const search = (useLocation()).search;
@@ -32,6 +33,7 @@ function Main() {
 
   useEffect(() => {
     ( async () => {
+      const t = ( new Date() ).getTime();
       let loginInfoStr = sessionStorage.getItem( 'loginInfo' );
       if( loginInfoStr ){
         const _loginInfo = JSON.parse( loginInfoStr );
@@ -42,10 +44,20 @@ function Main() {
             const p = param.split('=');
             if (p[0] === 'code') {
               const code = Buffer.from( p[1], 'base64' ).toString();
-              sessionStorage.setItem( 'loginInfo', code );
               try{
                 const user = JSON.parse( code );
-                setLoginInfo( user );
+                //console.log( t, user.time );  
+                if( user && user.time ){
+                  if( user.time + allowedDeltaMiilis > t && user.time - allowedDeltaMiilis < t ){
+                    console.log( 'OK' );
+                    sessionStorage.setItem( 'loginInfo', code );
+                    setLoginInfo( user );
+                  }else{
+                    //. 時刻に差がありすぎる？？
+                    console.log( t, user.time );  
+                    alert( 'Be sure both spa/web app has same timeclock, and no too low network latency.' );
+                  }
+                }
               }catch( e ){
               }
               navigate( '/' );

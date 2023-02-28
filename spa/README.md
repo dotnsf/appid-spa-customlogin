@@ -43,3 +43,6 @@ https://www.npmjs.com/package/ibmcloud-appid-js
 https://ibm-cloud-security.github.io/appid-clientsdk-js/
 
 https://www.ibm.com/cloud/blog/secure-your-single-page-react-apps-using-app-id
+
+https://cloud.ibm.com/docs/appid?topic=appid-branded
+
