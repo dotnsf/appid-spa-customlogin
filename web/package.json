@@ -1,0 +1,21 @@
+{
+    "name": "appid_web",
+    "version": "0.0.1",
+    "scripts": {
+        "start": "node app.js"
+    },
+    "dependencies": {
+        "body-parser": "^1.20.2",
+        "dotenv": "^16.0.3",
+        "ejs": "^3.1.8",
+        "express": "^4.18.2",
+        "express-session": "^1.17.3",
+        "ibmcloud-appid": "^7.0.0",
+        "passport": "^0.6.0",
+        "request": "^2.88.2"
+    },
+    "repository": {},
+    "engines": {
+        "node": "16.x"
+    }
+}
