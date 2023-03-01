@@ -1,10 +1,12 @@
 //. app.js
 var express = require( 'express' ),
     bodyParser = require( 'body-parser' ),
+    cookieParser = require( 'cookie-parser' ),
     ejs = require( 'ejs' ),
     passport = require( 'passport' ),
     request = require( 'request' ),
     session = require( 'express-session' ),
+    sessionStorage = require( 'sessionstorage-for-nodejs' ),
 //    ApiStrategy = require( 'ibmcloud-appid' ).APIStrategy,
     WebAppStrategy = require( 'ibmcloud-appid' ).WebAppStrategy,
     SelfServiceManager = require( 'ibmcloud-appid' ).SelfServiceManager,
@@ -21,9 +23,11 @@ var settings_api_key = 'API_KEY' in process.env ? process.env.API_KEY : '';
 var settings_appid_oauth_server_url = 'https://' + settings_appid_region + '.appid.cloud.ibm.com/oauth/v4/' + settings_appid_tenant_id;
 
 //. setup session
+//app.use( cookieParser );
 app.use( session({
   secret: 'appid_web',
   resave: false,
+  cookie: { httpOnly: true, secure: false },
   saveUninitialized: false
 }));
 
@@ -57,6 +61,16 @@ var selfServiceManager = new SelfServiceManager({
 
 //. login UI
 app.get( '/', function( req, res ){
+  var str = ( req.query.str ? req.query.str : '' );
+  //res.render( 'login', { message: message } );
+  if( str ){
+    sessionStorage.setItem( 'str', str );
+  }
+  res.redirect( '/login' );
+});
+
+//. login UI
+app.get( '/login', function( req, res ){
   var message = ( req.query.message ? req.query.message : '' );
   res.render( 'login', { message: message } );
 });
@@ -88,7 +102,7 @@ app.get( '/appid/logout', function( req, res ){
 //. login submit
 app.post( '/appid/login/submit', bodyParser.urlencoded({extended: false}), passport.authenticate(WebAppStrategy.STRATEGY_NAME, {
 	successRedirect: '/appid/loggedin',
-	failureRedirect: '/?message=login failed.',
+	failureRedirect: '/login?message=login failed.',
 	failureFlash : false
 }));
 
@@ -119,10 +133,13 @@ app.get( '/appid/loggedin', function( req, res ){
   var user = {};
   if( req.user ){
     var t = ( new Date() ).getTime();
+    var str = sessionStorage.getItem( 'str' );
+    sessionStorage.setItem( 'str', '' );
     user = { 
       id: req.user.id, 
       name: req.user.name,
       email: req.user.email,
+      str: str,
       time: t
     };
   }
@@ -177,7 +194,7 @@ app.post( '/appid/resetpassword', function( req, res ){
       res.redirect( '/signup?message=' + JSON.stringify( err ) );
     });
   }else{
-    res.redirect( '/?message=no language and/or email specified.' );
+    res.redirect( '/login?message=no language and/or email specified.' );
   }
 });
 
@@ -216,16 +233,16 @@ app.post( '/appid/newpassword', async function( req, res ){
           res.redirect( '/' );
         }).catch( function( err ){
           console.log( { err } );
-          res.redirect( '/?message=' + JSON.stringify( err ) );
+          res.redirect( '/login?message=' + JSON.stringify( err ) );
         });
       }else{
-        res.redirect( '/?message=no user information found.' );
+        res.redirect( '/login?message=no user information found.' );
       }
     }else{
       res.redirect( '/signup?message=password not mached.' );
     }
   }else{
-    res.redirect( '/?message=no language and/or email specified.' );
+    res.redirect( '/login?message=no language and/or email specified.' );
   }
 });
 
@@ -239,7 +256,7 @@ app.get( '/appid/users', async function( req, res ){
 app.all( '/*', function( req, res, next ){
   if( !req.user || !req.user.sub ){
     //. ログイン済みでない場合は強制的にログインページへ
-    res.redirect( '/' );
+    res.redirect( '/login' );
   }else{
     next();
   }

@@ -13,6 +13,12 @@ function Main() {
   const params = (search.startsWith('?') ? search.substr(1) : '');
 
   const [loginInfo, setLoginInfo] = React.useState( null );
+  //const [str, setStr] = React.useState( '' );  //. 一度他のページに遷移するとリセットされてしまう？
+
+  const randomStr = ( n = 16 ) => {
+    const S = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    return Array.from(Array(n)).map(()=>S[Math.floor(Math.random()*S.length)]).join('');
+  }
 
   const logoutAction = async () => {
     try{
@@ -25,7 +31,10 @@ function Main() {
 
   const loginAction = () => {
     const timeout = setTimeout( () => {
-      window.location.replace( process.env.REACT_APP_WEBAPP_URL );
+      const str = randomStr();
+      //setStr( s );
+      sessionStorage.setItem( 'str', str );
+      window.location.replace( process.env.REACT_APP_WEBAPP_URL + '?str=' + str );
     }, 3000 );
 
     return () => clearTimeout( timeout );
@@ -46,19 +55,26 @@ function Main() {
               const code = Buffer.from( p[1], 'base64' ).toString();
               try{
                 const user = JSON.parse( code );
-                //console.log( t, user.time );  
+                const str = sessionStorage.getItem( 'str' );
+                sessionStorage.setItem( 'str', '' );
+                //console.log( t, str, user );
                 if( user && user.time ){
-                  if( user.time + allowedDeltaMiilis > t && user.time - allowedDeltaMiilis < t ){
-                    console.log( 'OK' );
-                    sessionStorage.setItem( 'loginInfo', code );
-                    setLoginInfo( user );
+                  if( str == user.str ){
+                    //if( user.time + allowedDeltaMiilis > t && user.time - allowedDeltaMiilis < t ){
+                      console.log( 'OK' );
+                      sessionStorage.setItem( 'loginInfo', code );
+                      setLoginInfo( user );
+                    //}else{
+                      //. 時刻に差がありすぎる？？
+                    //  console.log( t, user.time );  
+                    //  alert( 'Be sure both spa/web app has same timeclock, and no too low network latency.' );
+                    //}
                   }else{
-                    //. 時刻に差がありすぎる？？
-                    console.log( t, user.time );  
-                    alert( 'Be sure both spa/web app has same timeclock, and no too low network latency.' );
+                    console.log( 'challenge str unmatched.' );  
                   }
                 }
               }catch( e ){
+                console.log( {e} );
               }
               navigate( '/' );
             }
