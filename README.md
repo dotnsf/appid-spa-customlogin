@@ -88,3 +88,5 @@ app.post( '/appid/login/submit', bodyParser.urlencoded({extended: false}), passp
 }));
 ```
 
+- [x] ランダム文字列によるチャレンジ機能を実装して対応
+
