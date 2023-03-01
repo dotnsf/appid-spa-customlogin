@@ -1,13 +1,11 @@
 //. app.js
 var express = require( 'express' ),
     bodyParser = require( 'body-parser' ),
-    cookieParser = require( 'cookie-parser' ),
     ejs = require( 'ejs' ),
     passport = require( 'passport' ),
     request = require( 'request' ),
     session = require( 'express-session' ),
     sessionStorage = require( 'sessionstorage-for-nodejs' ),
-//    ApiStrategy = require( 'ibmcloud-appid' ).APIStrategy,
     WebAppStrategy = require( 'ibmcloud-appid' ).WebAppStrategy,
     SelfServiceManager = require( 'ibmcloud-appid' ).SelfServiceManager,
     app = express();
@@ -23,7 +21,6 @@ var settings_api_key = 'API_KEY' in process.env ? process.env.API_KEY : '';
 var settings_appid_oauth_server_url = 'https://' + settings_appid_region + '.appid.cloud.ibm.com/oauth/v4/' + settings_appid_tenant_id;
 
 //. setup session
-//app.use( cookieParser );
 app.use( session({
   secret: 'appid_web',
   resave: false,
@@ -62,7 +59,6 @@ var selfServiceManager = new SelfServiceManager({
 //. login UI
 app.get( '/', function( req, res ){
   var str = ( req.query.str ? req.query.str : '' );
-  //res.render( 'login', { message: message } );
   if( str ){
     sessionStorage.setItem( 'str', str );
   }
@@ -105,28 +101,6 @@ app.post( '/appid/login/submit', bodyParser.urlencoded({extended: false}), passp
 	failureRedirect: '/login?message=login failed.',
 	failureFlash : false
 }));
-
-/*
- *
- * @param req - an HTTP request object
- * @param options.scope - The required scopes, separated by spaces. For example: 'read write update'
- * @param options.audience - (optional) the application clientId, or the resource URI.
- * @returns {*}
-  ApiStrategy.prototype.authenticate = function (req, options = {}) {
-
-*/
-/*
-app.post( '/appid/login/submit', function( req, res ){
-  console.log( req.body );
-  try{
-    var r = ApiStrategy.authenticate( req, { scope: 'read write update', audience: settings_appid_client_id } );
-    console.log( {r} );
-  }catch( e ){
-    console.log( {e} );
-  }
-  res.redirect( '/' );
-});
-*/
 
 //. loggedin
 app.get( '/appid/loggedin', function( req, res ){
@@ -213,7 +187,6 @@ app.post( '/appid/newpassword', async function( req, res ){
       for( var i = 0; i < obj.users.length; i ++ ){
         var user = obj.users[i];
         if( user.email.toUpperCase() == email.toUpperCase() ){
-          //uuid = user.id;
           console.log( { user } );
           var profile = await getProfile( user.id );  //. { id: "xx", email: "xxx", identities: [ { id: "yy", .. }, .. ], .. }
           console.log( { profile } );
