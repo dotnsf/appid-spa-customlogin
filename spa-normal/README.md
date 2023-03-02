@@ -3,9 +3,14 @@
 
 ## Environment values
 
-- `REACT_APP_WEBAPP_URL`
+- `REACT_APP_APPID_CLIENT_ID`
 
-  - Base URL of Authentication Web Application(web/)
+  - AppID Client ID(required)
+
+- `REACT_APP_APPID_ENDPOINT`
+
+  - AppID Discovery Endpoint URL(required)
+
 
 
 ## IBM AppID

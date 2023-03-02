@@ -90,3 +90,17 @@ app.post( '/appid/login/submit', bodyParser.urlencoded({extended: false}), passp
 
 - [x] ランダム文字列によるチャレンジ機能を実装して対応
 
+
+## 参考
+
+Web アプリケーションを使わない、標準の AppID を PKCE プロトコルで使った（通常版の） SPA サンプル
+
+- `spa-normal/` サブフォルダ
+
+- 以下の環境変数を設定：
+  - REACT_APP_CLIENT_ID : AppID の CLIENT_ID 値
+  - REACT_APP_ENDPOINT : AppID の Discovery Endpoint URL 値 
+
+- 実行
+  - `$ npm run start`
+
