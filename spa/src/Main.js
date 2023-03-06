@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Buffer } from 'buffer';
+import * as jose from 'jose';
 
 import logo from './logo.svg';
 import './Main.css';
@@ -55,14 +56,19 @@ function Main() {
         //. ログイン情報が sessionStorage に入っていない場合
         if( params ){
           //. パラメータが含まれていたら解析
-          params.split('&').forEach((param) => {
+          params.split('&').forEach( async (param) => {
             const p = param.split('=');
             if (p[0] === 'code') {
-              const code = Buffer.from( p[1], 'base64' ).toString();
+              const code = p[1];
               try{
-                //. パラメータを取り出して、ログイン前に sessionStorage に格納したチャレンジ情報と比較
-                const user = JSON.parse( code );
+                //. #1
                 const str = sessionStorage.getItem( 'str' );
+                const secret = new TextEncoder().encode( str );
+
+                //. パラメータを取り出して、ログイン前に sessionStorage に格納したチャレンジ情報と比較
+                //const user = JSON.parse( code );
+                const { payload, protectedHeader } = await jose.jwtVerify( code, secret );
+                const user = payload;
                 sessionStorage.setItem( 'str', '' );
                 //console.log( t, str, user );
                 if( user && user.time ){
@@ -71,7 +77,7 @@ function Main() {
                       if( user.time + allowedDeltaMiilis > t && user.time - allowedDeltaMiilis < t ){
                         //. チャレンジ成功したらログイン情報を sessionStorage に格納
                         console.log( 'OK' );
-                        sessionStorage.setItem( 'loginInfo', code );
+                        sessionStorage.setItem( 'loginInfo', JSON.stringify( user ) );
                         setLoginInfo( user );
                       }else{
                         //. 時刻に差がありすぎる？？
@@ -81,7 +87,7 @@ function Main() {
                     }else{
                       //. チャレンジ成功したらログイン情報を sessionStorage に格納
                       console.log( 'OK' );
-                      sessionStorage.setItem( 'loginInfo', code );
+                      sessionStorage.setItem( 'loginInfo', JSON.stringify( user ) );
                       setLoginInfo( user );
                     }
                   }else{

@@ -91,6 +91,13 @@ app.post( '/appid/login/submit', bodyParser.urlencoded({extended: false}), passp
 - [x] ランダム文字列によるチャレンジ機能を実装して対応
 
 
+## 参照
+
+[React(SPA)での認証についてまとめ](https://coders-shelf.com/react-auth-problem/)
+
+[Error when attempting to include Crypto module: Can't resolve 'crypto'](https://stackoverflow.com/questions/70971125/error-when-attempting-to-include-crypto-module-cant-resolve-crypto)
+
+
 ## 参考
 
 Web アプリケーションを使わない、標準の AppID を PKCE プロトコルで使った（通常版の） SPA サンプル

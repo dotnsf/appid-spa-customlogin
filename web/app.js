@@ -2,6 +2,7 @@
 var express = require( 'express' ),
     bodyParser = require( 'body-parser' ),
     ejs = require( 'ejs' ),
+    jwt = require( 'jsonwebtoken' ),
     passport = require( 'passport' ),
     request = require( 'request' ),
     session = require( 'express-session' ),
@@ -117,7 +118,10 @@ app.get( '/appid/loggedin', function( req, res ){
       time: t
     };
   }
-  var code = Buffer.from( JSON.stringify( user ) ).toString( 'base64' );  //. max 2048 chars
+
+  //. #1
+  //var code = Buffer.from( JSON.stringify( user ) ).toString( 'base64' );  //. max 2048 chars
+  var code = jwt.sign( user, str );
 
   res.redirect( settings_spa_url + '?code=' + code );
 });
